@@ -5,7 +5,7 @@ import {
   RawBodyRequest,
 } from '@nestjs/common';
 import { RequestBodyInteraction } from './types';
-import { BOT_PUBLIC_KEY } from './consts';
+import { BOT_PUBLIC_KEY, DISCORD_API_ENDPOINT } from './consts';
 import { InteractionResponseType, verifyKey } from 'discord-interactions';
 
 @Injectable()
@@ -37,16 +37,40 @@ export class AppService {
     return {};
   }
 
-  exchangeCodeForToken(body: { code: string; guild_id: string }) {
+  async exchangeCodeForToken(body: { code: string; guild_id: string }) {
     const { code, guild_id } = body;
 
     if (typeof code !== 'string' || typeof guild_id !== 'string') {
       throw new HttpException('Bad Request', HttpStatus.BAD_REQUEST);
     }
-
-    // TODO:コードを交換する
-    // https://discord.com/developers/docs/topics/oauth2#authorization-code-grant-access-token-exchange-example
     console.log(code, guild_id);
+
+    const data = new URLSearchParams();
+    const { DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET, HOST } = process.env;
+    data.append('client_id', DISCORD_CLIENT_ID);
+    data.append('client_secret', DISCORD_CLIENT_SECRET);
+    data.append('grant_type', 'authorization_code');
+    data.append('code', code);
+    data.append('redirect_uri', HOST);
+
+    try {
+      const response = await fetch(`${DISCORD_API_ENDPOINT}/oauth2/token`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: data,
+      });
+
+      if (!response.ok) {
+        throw new HttpException('cannot get token', HttpStatus.BAD_REQUEST);
+      }
+      console.log('token exchange success');
+      console.log(response.json());
+    } catch (error) {
+      throw new Error(error.message);
+    }
+
     return {};
   }
 }
