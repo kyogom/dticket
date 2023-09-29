@@ -28,19 +28,25 @@ export class AppService {
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
     }
 
-    console.log('--DEBUG--');
-    console.log(signature);
-    console.log(timestamp);
-    console.log(rawBody);
-    console.log(isVerified);
-    console.log('--DEBUG--');
-
     if (body.type === InteractionResponseType.PONG) {
       return {
         type: InteractionResponseType.PONG,
       };
     }
 
+    return {};
+  }
+
+  exchangeCodeForToken(body: { code: string; guild_id: string }) {
+    const { code, guild_id } = body;
+
+    if (typeof code !== 'string' || typeof guild_id !== 'string') {
+      throw new HttpException('Bad Request', HttpStatus.BAD_REQUEST);
+    }
+
+    // TODO:コードを交換する
+    // https://discord.com/developers/docs/topics/oauth2#authorization-code-grant-access-token-exchange-example
+    console.log(code, guild_id);
     return {};
   }
 }

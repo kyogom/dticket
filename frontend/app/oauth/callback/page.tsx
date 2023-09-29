@@ -1,7 +1,22 @@
 import discord from "./discord.svg";
 import Image from "next/image";
+import { postAuthCode } from "@/lib/fetch";
 
-const Callback = async ({ params }: { params: { slug: string } }) => {
+const Callback = async ({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string | string[] | undefined };
+}) => {
+  const { code, guild_id } = searchParams;
+  if (typeof code !== "string" && typeof guild_id !== "string") {
+    return <>Authentication Failed {`code: ${code}, guild_id: ${guild_id}`}</>;
+  }
+  try {
+    await postAuthCode({ code: String(code), guild_id: String(guild_id) });
+  } catch (error) {
+    return <>Authentication Failed {`code: ${code}, guild_id: ${guild_id}`}</>;
+  }
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
       <div className="flex flex-col items-center p-8 bg-white rounded shadow">

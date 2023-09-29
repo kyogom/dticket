@@ -19,11 +19,12 @@ export class AppController {
   }
 
   @Post('api/interactions')
-  interact(
-    @Req() req: RawBodyRequest<Request>,
-    @Body() body,
-    // @Res() res: Response,
-  ): any {
+  interact(@Req() req: RawBodyRequest<Request>, @Body() body): any {
     return this.appService.handleInteractInit(req, body);
+  }
+
+  @Post('api/authorize')
+  exchangeCodeForToken(@Body() body): any {
+    return this.appService.exchangeCodeForToken(body);
   }
 }
