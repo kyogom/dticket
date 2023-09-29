@@ -5,8 +5,8 @@ import {
   RawBodyRequest,
 } from '@nestjs/common';
 import { RequestBodyInteraction } from './types';
-import { BOT_PUBLIC_KEY, INTERACTION_CALLBACK_TYPES } from './consts';
-import { verifyKey } from 'discord-interactions';
+import { BOT_PUBLIC_KEY } from './consts';
+import { InteractionResponseType, verifyKey } from 'discord-interactions';
 
 @Injectable()
 export class AppService {
@@ -35,9 +35,9 @@ export class AppService {
     console.log(isVerified);
     console.log('--DEBUG--');
 
-    if (body.type === INTERACTION_CALLBACK_TYPES.PONG) {
+    if (body.type === InteractionResponseType.PONG) {
       return {
-        type: INTERACTION_CALLBACK_TYPES.PONG,
+        type: InteractionResponseType.PONG,
       };
     }
 
