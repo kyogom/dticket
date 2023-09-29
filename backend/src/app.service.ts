@@ -63,6 +63,13 @@ export class AppService {
       });
 
       if (!response.ok) {
+        console.log(
+          DISCORD_CLIENT_ID,
+          DISCORD_CLIENT_SECRET,
+          code,
+          `${HOST}/oauth/callback`,
+        );
+        console.log(response.json());
         throw new HttpException('cannot get token', HttpStatus.BAD_REQUEST);
       }
       console.log('token exchange success');
