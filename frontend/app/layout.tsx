@@ -1,14 +1,17 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import { APP_NAME } from "./constants";
+import { APP_NAME } from "@/constants";
 
 const inter = Inter({ subsets: ["latin"] });
 
 const { NODE_ENV } = process.env;
 
 export const metadata: Metadata = {
-  title: NODE_ENV === "production" ? APP_NAME : `${APP_NAME} | ${NODE_ENV}`,
+  title:
+    NODE_ENV === "production"
+      ? APP_NAME
+      : `${APP_NAME} | ${NODE_ENV.toString()}`,
   description: "Customer Service App for Discord Users",
 };
 

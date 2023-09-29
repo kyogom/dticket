@@ -12,7 +12,9 @@ const Callback = async ({
     return <>Authentication Failed {`code: ${code}, guild_id: ${guild_id}`}</>;
   }
   try {
-    await postAuthCode({ code: String(code), guild_id: String(guild_id) });
+    if (typeof code === "string" && typeof guild_id === "string") {
+      await postAuthCode({ code, guild_id });
+    }
   } catch (error) {
     return <>Authentication Failed {`code: ${code}, guild_id: ${guild_id}`}</>;
   }
