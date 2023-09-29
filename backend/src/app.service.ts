@@ -53,23 +53,23 @@ export class AppService {
     data.append('code', code);
     data.append('redirect_uri', HOST);
 
-    try {
-      const response = await fetch(`${DISCORD_API_ENDPOINT}/oauth2/token`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: data,
-      });
+    // try {
+    //   const response = await fetch(`${DISCORD_API_ENDPOINT}/oauth2/token`, {
+    //     method: 'POST',
+    //     headers: {
+    //       'Content-Type': 'application/x-www-form-urlencoded',
+    //     },
+    //     body: data,
+    //   });
 
-      if (!response.ok) {
-        throw new HttpException('cannot get token', HttpStatus.BAD_REQUEST);
-      }
-      console.log('token exchange success');
-      console.log(response.json());
-    } catch (error) {
-      throw new Error(error.message);
-    }
+    //   if (!response.ok) {
+    //     throw new HttpException('cannot get token', HttpStatus.BAD_REQUEST);
+    //   }
+    //   console.log('token exchange success');
+    //   console.log(response.json());
+    // } catch (error) {
+    //   throw new Error(error.message);
+    // }
 
     return {};
   }
