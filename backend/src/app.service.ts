@@ -46,12 +46,13 @@ export class AppService {
     console.log(code, guild_id);
 
     const data = new URLSearchParams();
-    const { DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET, HOST } = process.env;
+    const { DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET, HOST_FRONTEND } =
+      process.env;
     data.append('client_id', DISCORD_CLIENT_ID);
     data.append('client_secret', DISCORD_CLIENT_SECRET);
     data.append('grant_type', 'authorization_code');
     data.append('code', code);
-    data.append('redirect_uri', `${HOST}/oauth/callback`);
+    data.append('redirect_uri', `${HOST_FRONTEND}/oauth/callback`);
 
     try {
       const response = await fetch(`${DISCORD_API_ENDPOINT}/oauth2/token`, {
@@ -67,7 +68,7 @@ export class AppService {
           DISCORD_CLIENT_ID,
           DISCORD_CLIENT_SECRET,
           code,
-          `${HOST}/oauth/callback`,
+          `${HOST_FRONTEND}/oauth/callback`,
         );
         console.log(response.json());
         throw new HttpException('cannot get token', HttpStatus.BAD_REQUEST);
