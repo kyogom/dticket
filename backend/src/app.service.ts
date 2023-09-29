@@ -1,5 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  RawBodyRequest,
+} from '@nestjs/common';
 import { RequestBodyInteraction } from './types';
+import { BOT_PUBLIC_KEY, INTERACTION_CALLBACK_TYPES } from './consts';
+import { verifyKey } from 'discord-interactions';
 
 @Injectable()
 export class AppService {
@@ -7,10 +14,33 @@ export class AppService {
     return 'Hello World!';
   }
 
-  handleInteractInit(req: Request, body: RequestBodyInteraction) {
-    console.log(req);
-    console.log(body);
-    throw Error('implement me!'); //TODO: implement
-    return 'test';
+  handleInteractInit(
+    req: RawBodyRequest<Request>,
+    body: RequestBodyInteraction,
+  ) {
+    const signature = req.headers['x-signature-ed25519'] ?? '';
+    const timestamp = req.headers['x-signature-timestamp'] ?? '';
+    const rawBody = req.rawBody;
+    const isVerified = verifyKey(rawBody, signature, timestamp, BOT_PUBLIC_KEY);
+
+    // https://discord.com/developers/docs/interactions/receiving-and-responding#security-and-authorization
+    if (!isVerified) {
+      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+    }
+
+    console.log('--DEBUG--');
+    console.log(signature);
+    console.log(timestamp);
+    console.log(rawBody);
+    console.log(isVerified);
+    console.log('--DEBUG--');
+
+    if (body.type === INTERACTION_CALLBACK_TYPES.PONG) {
+      return {
+        type: INTERACTION_CALLBACK_TYPES.PONG,
+      };
+    }
+
+    return {};
   }
 }

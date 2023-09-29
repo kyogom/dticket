@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Post, Req } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  RawBodyRequest,
+  Req,
+  Res,
+} from '@nestjs/common';
 import { AppService } from './app.service';
 
 @Controller()
@@ -11,11 +19,11 @@ export class AppController {
   }
 
   @Post('api/interactions')
-  interact(@Req() req: Request, @Body() body): any {
-    console.log('## Headers');
-    console.log(req.headers);
-    console.log('## Body');
-    console.log(body);
-    return 'test';
+  interact(
+    @Req() req: RawBodyRequest<Request>,
+    @Body() body,
+    // @Res() res: Response,
+  ): any {
+    return this.appService.handleInteractInit(req, body);
   }
 }
