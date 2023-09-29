@@ -51,25 +51,25 @@ export class AppService {
     data.append('client_secret', DISCORD_CLIENT_SECRET);
     data.append('grant_type', 'authorization_code');
     data.append('code', code);
-    data.append('redirect_uri', HOST);
+    data.append('redirect_uri', `${HOST}/oauth/callback`);
 
-    // try {
-    //   const response = await fetch(`${DISCORD_API_ENDPOINT}/oauth2/token`, {
-    //     method: 'POST',
-    //     headers: {
-    //       'Content-Type': 'application/x-www-form-urlencoded',
-    //     },
-    //     body: data,
-    //   });
+    try {
+      const response = await fetch(`${DISCORD_API_ENDPOINT}/oauth2/token`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: data,
+      });
 
-    //   if (!response.ok) {
-    //     throw new HttpException('cannot get token', HttpStatus.BAD_REQUEST);
-    //   }
-    //   console.log('token exchange success');
-    //   console.log(response.json());
-    // } catch (error) {
-    //   throw new Error(error.message);
-    // }
+      if (!response.ok) {
+        throw new HttpException('cannot get token', HttpStatus.BAD_REQUEST);
+      }
+      console.log('token exchange success');
+      console.log(response.json());
+    } catch (error) {
+      throw new Error(error.message);
+    }
 
     return {};
   }
