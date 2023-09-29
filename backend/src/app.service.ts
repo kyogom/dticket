@@ -70,11 +70,11 @@ export class AppService {
           code,
           `${HOST_FRONTEND}/oauth/callback`,
         );
-        console.log(response.json());
         throw new HttpException('cannot get token', HttpStatus.BAD_REQUEST);
       }
-      console.log('token exchange success');
-      console.log(response.json());
+
+      // 本来はDBにトークンを保存する user.token
+      console.log(await response.json());
     } catch (error) {
       throw new Error(error.message);
     }
