@@ -74,7 +74,16 @@ export class AppService {
       }
 
       // 本来はDBにトークンを保存する user.token
-      console.log(await response.json());
+      const responseToken = await response.json();
+      const accessToken = responseToken['access_token'];
+      const refreshToken = responseToken['refresh_token'];
+      console.log(refreshToken);
+      const userResponse = await fetch(`${DISCORD_API_ENDPOINT}/users/@me`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      console.log(await userResponse.json());
     } catch (error) {
       throw new Error(error.message);
     }
