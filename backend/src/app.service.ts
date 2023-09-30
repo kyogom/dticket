@@ -9,7 +9,6 @@ import { BOT_PUBLIC_KEY, DISCORD_API_ENDPOINT } from './consts';
 import { InteractionResponseType, verifyKey } from 'discord-interactions';
 import dict from './dict';
 import { PrismaService } from './prisma.service';
-import { randomUUID } from 'crypto';
 
 @Injectable()
 export class AppService {
@@ -97,14 +96,12 @@ export class AppService {
       // FIXME: organizationとuserはmanyTomanyにする
       await this.prisma.helpdesk_users.create({
         data: {
-          id: randomUUID(),
           access_token: accessToken,
           email: user.email,
           locale: user.locale,
           name: user.username,
           organizations: {
             create: {
-              id: randomUUID(),
               name: user.username,
               domain: user.username,
             },

@@ -8,14 +8,14 @@ datasource db {
 }
 
 model channels {
-  id                 String        @id @db.Uuid
+  id                 String        @id @default(uuid()) @db.Uuid
   discord_channel_id String?       @db.VarChar
   organization_id    String        @db.Uuid
   organizations      organizations @relation(fields: [organization_id], references: [id], onUpdate: Restrict)
 }
 
 model helpdesk_users {
-  id              String        @id @db.Uuid
+  id              String        @id @default(uuid()) @db.Uuid
   organization_id String        @db.Uuid
   email           String        @db.VarChar
   name            String        @db.VarChar
@@ -37,7 +37,7 @@ model organizations {
 }
 
 model question_sheets {
-  id              String        @id @db.Uuid
+  id              String        @id @default(uuid()) @db.Uuid
   organization_id String        @db.Uuid
   structure       Json          @db.Json
   organizations   organizations @relation(fields: [organization_id], references: [id], onUpdate: Restrict)
@@ -45,14 +45,14 @@ model question_sheets {
 }
 
 model questioners {
-  id        String      @id(map: "users_pkey") @db.Uuid
+  id        String      @id(map: "users_pkey") @default(uuid()) @db.Uuid
   email     String      @db.VarChar
   name      String?     @db.VarChar
   questions questions[]
 }
 
 model questions {
-  id                String          @id @db.Uuid
+  id                String          @id @default(uuid()) @db.Uuid
   questioner_id     String          @db.Uuid
   content           Json            @db.Json
   question_sheet_id String          @db.Uuid
