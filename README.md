@@ -6,13 +6,15 @@
 
 ### Debug
 
-`pnpm dev`
+(初回のみ) `yarn global add prisma`
+`yarn dev`
+`yarn prisma migrate reset`
 
 ### Deploy
 
 (初回のみ) `heroku git:remote -a discordticket`  
 `git subtree push --prefix backend/ heroku main`
-`prisma migrate dev`
+`yarn prisma migrate dev`
 
 ## Frontend
 

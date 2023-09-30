@@ -8,9 +8,13 @@ import { RequestBodyInteraction, ResponseBodyUsersMe } from './types';
 import { BOT_PUBLIC_KEY, DISCORD_API_ENDPOINT } from './consts';
 import { InteractionResponseType, verifyKey } from 'discord-interactions';
 import dict from './dict';
+import { PrismaService } from './prisma.service';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class AppService {
+  constructor(private prisma: PrismaService) {}
+
   getHello(): string {
     return 'Hello World!';
   }
@@ -44,7 +48,6 @@ export class AppService {
     if (typeof code !== 'string' || typeof guild_id !== 'string') {
       throw new HttpException('Bad Request', HttpStatus.BAD_REQUEST);
     }
-    console.log(code, guild_id);
 
     const data = new URLSearchParams();
     const { DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET, HOST_FRONTEND } =
@@ -86,6 +89,25 @@ export class AppService {
       });
       const user = (await userResponse.json()) as ResponseBodyUsersMe;
       console.log('DEBUG: refresh_token:' + refreshToken);
+
+      // FIXME: organizationとuserはmanyTomanyにする
+      this.prisma.helpdesk_users.create({
+        data: {
+          id: randomUUID(),
+          access_token: accessToken,
+          email: user.email,
+          locale: user.locale,
+          name: user.username,
+          organizations: {
+            create: {
+              id: randomUUID(),
+              name: user.username,
+              domain: user.username,
+            },
+          },
+          refresh_token: refreshToken,
+        },
+      });
       return {
         data: {
           message: dict['ようこそ%sさん'][user.locale].replace(
