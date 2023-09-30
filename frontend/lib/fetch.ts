@@ -8,6 +8,8 @@ export const postAuthCode = async ({
   guild_id: string;
 }): Promise<void> => {
   try {
+    console.log("## Debug ##");
+    console.log("call " + `${API_BASE_URL}/authorize`);
     const response = await fetch(`${API_BASE_URL}/authorize`, {
       method: "POST",
       body: JSON.stringify({ code, guild_id }),
