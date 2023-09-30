@@ -91,7 +91,7 @@ export class AppService {
       console.log('DEBUG: refresh_token:' + refreshToken);
 
       // FIXME: organizationとuserはmanyTomanyにする
-      this.prisma.helpdesk_users.create({
+      await this.prisma.helpdesk_users.create({
         data: {
           id: randomUUID(),
           access_token: accessToken,
