@@ -20,3 +20,16 @@ export type RequestBodyInteractionUser = {
   public_flags: number;
   username: string;
 };
+
+export type ResponseBodyUsersMe = {
+  id: string;
+  username: string;
+  avatar: string;
+  discriminator: string;
+  public_flags: number;
+  global_name: string;
+  mfa_enabled: boolean;
+  locale: string;
+  premium_type: number;
+  email: string;
+};

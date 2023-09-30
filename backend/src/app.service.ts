@@ -4,9 +4,10 @@ import {
   Injectable,
   RawBodyRequest,
 } from '@nestjs/common';
-import { RequestBodyInteraction } from './types';
+import { RequestBodyInteraction, ResponseBodyUsersMe } from './types';
 import { BOT_PUBLIC_KEY, DISCORD_API_ENDPOINT } from './consts';
 import { InteractionResponseType, verifyKey } from 'discord-interactions';
+import dict from './dict';
 
 @Injectable()
 export class AppService {
@@ -77,17 +78,21 @@ export class AppService {
       const responseToken = await response.json();
       const accessToken = responseToken['access_token'];
       const refreshToken = responseToken['refresh_token'];
-      console.log(refreshToken);
+
       const userResponse = await fetch(`${DISCORD_API_ENDPOINT}/users/@me`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
       });
-      console.log(await userResponse.json());
+      const user = (await userResponse.json()) as ResponseBodyUsersMe;
+      console.log('DEBUG: refresh_token:' + refreshToken);
+      return {
+        data: {
+          message: dict['ようこそ%sさん'][user.locale],
+        },
+      };
     } catch (error) {
       throw new Error(error.message);
     }
-
-    return {};
   }
 }

@@ -6,10 +6,8 @@ export const postAuthCode = async ({
 }: {
   code: string;
   guild_id: string;
-}): Promise<void> => {
+}): Promise<{ message: string }> => {
   try {
-    console.log("## Debug ##");
-    console.log("call " + `${API_BASE_URL}/authorize`);
     const response = await fetch(`${API_BASE_URL}/authorize`, {
       method: "POST",
       body: JSON.stringify({ code, guild_id }),
@@ -20,7 +18,7 @@ export const postAuthCode = async ({
     if (!response.ok) {
       throw new Error("Network response was not ok");
     }
-    const data = await response.json();
+    const { data } = await response.json();
     return data;
   } catch (error) {
     console.error("Error fetching data:", error);
