@@ -74,7 +74,11 @@ export class AppService {
           code,
           `${HOST_FRONTEND}/oauth/callback`,
         );
-        throw new HttpException('cannot get token', HttpStatus.BAD_REQUEST);
+
+        throw new HttpException(
+          'cannot get token message:' + JSON.stringify(response.json()),
+          HttpStatus.BAD_REQUEST,
+        );
       }
 
       // 本来はDBにトークンを保存する user.token
