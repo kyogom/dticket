@@ -12,6 +12,7 @@
 
 (初回のみ) `heroku git:remote -a discordticket`  
 `git subtree push --prefix backend/ heroku main`
+`prisma migrate dev`
 
 ## Frontend
 

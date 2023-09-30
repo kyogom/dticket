@@ -1,0 +1,61 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model channels {
+  id                 String        @id @db.Uuid
+  discord_channel_id String?       @db.VarChar
+  organization_id    String        @db.Uuid
+  organizations      organizations @relation(fields: [organization_id], references: [id], onUpdate: Restrict)
+}
+
+model helpdesk_users {
+  id              String        @id @db.Uuid
+  organization_id String        @db.Uuid
+  email           String        @db.VarChar
+  name            String        @db.VarChar
+  locale          String        @db.VarChar
+  access_token    String        @db.VarChar
+  refresh_token   String        @db.VarChar
+  created_at      DateTime      @default(now()) @db.Timestamp(6)
+  updated_at      DateTime      @updatedAt
+  organizations   organizations @relation(fields: [organization_id], references: [id], onUpdate: Restrict)
+}
+
+model organizations {
+  id              String            @id(map: "account_companies_pkey") @db.Uuid
+  domain          String            @db.VarChar
+  name            String?           @db.VarChar
+  helpdesk_users  helpdesk_users[]
+  question_sheets question_sheets[]
+  channels        channels[]
+}
+
+model question_sheets {
+  id              String        @id @db.Uuid
+  organization_id String        @db.Uuid
+  structure       Json          @db.Json
+  organizations   organizations @relation(fields: [organization_id], references: [id], onUpdate: Restrict)
+  questions       questions[]
+}
+
+model questioners {
+  id        String      @id(map: "users_pkey") @db.Uuid
+  email     String      @db.VarChar
+  name      String?     @db.VarChar
+  questions questions[]
+}
+
+model questions {
+  id                String          @id @db.Uuid
+  questioner_id     String          @db.Uuid
+  content           Json            @db.Json
+  question_sheet_id String          @db.Uuid
+  question_sheets   question_sheets @relation(fields: [question_sheet_id], references: [id], onUpdate: Restrict)
+  questioners       questioners     @relation(fields: [questioner_id], references: [id], onUpdate: Restrict)
+}
