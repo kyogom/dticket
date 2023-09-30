@@ -88,7 +88,10 @@ export class AppService {
       console.log('DEBUG: refresh_token:' + refreshToken);
       return {
         data: {
-          message: dict['ようこそ%sさん'][user.locale],
+          message: dict['ようこそ%sさん'][user.locale].replace(
+            '%s',
+            user.username,
+          ),
         },
       };
     } catch (error) {
