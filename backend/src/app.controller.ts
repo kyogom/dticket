@@ -23,7 +23,7 @@ export class AppController {
   }
 
   @Post('api/authorize')
-  exchangeCodeForToken(@Body() body): any {
-    return this.appService.exchangeCodeForToken(body);
+  createUser(@Body() body): any {
+    return this.appService.createUser(body);
   }
 }

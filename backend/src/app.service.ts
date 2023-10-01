@@ -4,11 +4,16 @@ import {
   Injectable,
   RawBodyRequest,
 } from '@nestjs/common';
-import { RequestBodyInteraction, ResponseBodyUsersMe } from './types';
+import {
+  RequestBodyInteraction,
+  ResponseBodyTokenExchange,
+  ResponseBodyUsersMe,
+} from './types';
 import { BOT_PUBLIC_KEY, DISCORD_API_ENDPOINT } from './consts';
 import { InteractionResponseType, verifyKey } from 'discord-interactions';
 import dict from './dict';
 import { PrismaService } from './prisma.service';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class AppService {
@@ -41,7 +46,36 @@ export class AppService {
     return {};
   }
 
-  async exchangeCodeForToken(body: { code: string; guild_id: string }) {
+  async exchangeCodeForToken(
+    data: URLSearchParams,
+  ): Promise<ResponseBodyTokenExchange> {
+    const response = await fetch(`${DISCORD_API_ENDPOINT}/oauth2/token`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: data,
+    });
+    if (!response.ok) {
+      throw new HttpException(
+        'cannot get token message:' + JSON.stringify(response.json()),
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    return (await response).json();
+  }
+
+  async fetchMe(access_token: string): Promise<ResponseBodyUsersMe> {
+    return await (
+      await fetch(`${DISCORD_API_ENDPOINT}/users/@me`, {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+        },
+      })
+    ).json();
+  }
+
+  async createUser(body: { code: string; guild_id: string }) {
     const { code, guild_id } = body;
 
     if (typeof code !== 'string' || typeof guild_id !== 'string') {
@@ -57,68 +91,31 @@ export class AppService {
     data.append('code', code);
     data.append('redirect_uri', `${HOST_FRONTEND}/oauth/callback`);
 
-    try {
-      const response = await fetch(`${DISCORD_API_ENDPOINT}/oauth2/token`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: data,
-      });
+    const tokenResponse = await this.exchangeCodeForToken(data);
+    const me = await this.fetchMe(tokenResponse.access_token);
 
-      if (!response.ok) {
-        console.log(
-          DISCORD_CLIENT_ID,
-          DISCORD_CLIENT_SECRET,
-          code,
-          `${HOST_FRONTEND}/oauth/callback`,
-        );
-
-        throw new HttpException(
-          'cannot get token message:' + JSON.stringify(response.json()),
-          HttpStatus.BAD_REQUEST,
-        );
-      }
-
-      // 本来はDBにトークンを保存する user.token
-      const responseToken = await response.json();
-      const accessToken = responseToken['access_token'];
-      const refreshToken = responseToken['refresh_token'];
-
-      const userResponse = await fetch(`${DISCORD_API_ENDPOINT}/users/@me`, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-      const user = (await userResponse.json()) as ResponseBodyUsersMe;
-      console.log('DEBUG: refresh_token:' + refreshToken);
-
-      // FIXME: organizationとuserはmanyTomanyにする
-      await this.prisma.helpdesk_users.create({
-        data: {
-          access_token: accessToken,
-          email: user.email,
-          locale: user.locale,
-          name: user.username,
-          organizations: {
-            create: {
-              name: user.username,
-              domain: user.username,
-            },
+    const createdUser = await this.prisma.helpdeskUsers.create({
+      data: {
+        accessToken: tokenResponse.access_token,
+        email: me.email,
+        locale: me.locale,
+        name: me.username,
+        organizations: {
+          create: {
+            id: randomUUID(),
+            domain: me.username,
           },
-          refresh_token: refreshToken,
         },
-      });
-      return {
-        data: {
-          message: dict['ようこそ%sさん'][user.locale].replace(
-            '%s',
-            user.username,
-          ),
-        },
-      };
-    } catch (error) {
-      throw new Error(error.message);
-    }
+        refreshToken: tokenResponse.refresh_token,
+      },
+    });
+    return {
+      data: {
+        message: dict['ようこそ%sさん'][createdUser.locale].replace(
+          '%s',
+          createdUser.name,
+        ),
+      },
+    };
   }
 }

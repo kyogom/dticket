@@ -21,15 +21,18 @@ export type RequestBodyInteractionUser = {
   username: string;
 };
 
+export type ResponseBodyTokenExchange = {
+  access_token: string;
+  expires_in: number;
+  refresh_token: string;
+  scope: string;
+  token_type: string;
+};
+
 export type ResponseBodyUsersMe = {
-  id: string;
-  username: string;
   avatar: string;
-  discriminator: string;
-  public_flags: number;
-  global_name: string;
-  mfa_enabled: boolean;
-  locale: string;
-  premium_type: number;
   email: string;
+  id: string;
+  locale: string;
+  username: string;
 };
