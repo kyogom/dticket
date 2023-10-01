@@ -30,7 +30,7 @@ describe('AppController', () => {
   // FIXME: 汚いのでリファクタする
   describe('createUser', () => {
     it('/api/authorize (POST)', async () => {
-      jest.spyOn(appService, 'exchangeCodeForToken').mockImplementation(
+      jest.spyOn(appService, 'getToken').mockImplementation(
         () =>
           new Promise((resolve) => {
             resolve({
@@ -50,6 +50,7 @@ describe('AppController', () => {
         locale: 'ja',
         username: 'kyogo',
       };
+
       jest.spyOn(appService, 'fetchMe').mockImplementation(
         () =>
           new Promise((resolve) => {
@@ -58,10 +59,10 @@ describe('AppController', () => {
       );
 
       const user = await appService.createUser({
-        code: '111',
-        guild_id: '222',
+        code: 'example',
+        guild_id: 'example',
       });
-      console.log(user);
+
       return expect(user).toEqual({
         data: {
           // FIXME: 英語版もテストする

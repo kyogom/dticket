@@ -46,9 +46,7 @@ export class AppService {
     return {};
   }
 
-  async exchangeCodeForToken(
-    data: URLSearchParams,
-  ): Promise<ResponseBodyTokenExchange> {
+  async getToken(data: URLSearchParams): Promise<ResponseBodyTokenExchange> {
     const response = await fetch(`${DISCORD_API_ENDPOINT}/oauth2/token`, {
       method: 'POST',
       headers: {
@@ -82,21 +80,22 @@ export class AppService {
       throw new HttpException('Bad Request', HttpStatus.BAD_REQUEST);
     }
 
-    const data = new URLSearchParams();
     const { DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET, HOST_FRONTEND } =
       process.env;
-    data.append('client_id', DISCORD_CLIENT_ID);
-    data.append('client_secret', DISCORD_CLIENT_SECRET);
-    data.append('grant_type', 'authorization_code');
-    data.append('code', code);
-    data.append('redirect_uri', `${HOST_FRONTEND}/oauth/callback`);
 
-    const tokenResponse = await this.exchangeCodeForToken(data);
-    const me = await this.fetchMe(tokenResponse.access_token);
-
+    const { access_token, refresh_token } = await this.getToken(
+      new URLSearchParams({
+        client_id: DISCORD_CLIENT_ID,
+        client_secret: DISCORD_CLIENT_SECRET,
+        grant_type: 'authorization_code',
+        code,
+        redirect_uri: `${HOST_FRONTEND}/oauth/callback`,
+      }),
+    );
+    const me = await this.fetchMe(access_token);
     const createdUser = await this.prisma.helpdeskUsers.create({
       data: {
-        accessToken: tokenResponse.access_token,
+        accessToken: access_token,
         email: me.email,
         locale: me.locale,
         name: me.username,
@@ -106,9 +105,10 @@ export class AppService {
             domain: me.username,
           },
         },
-        refreshToken: tokenResponse.refresh_token,
+        refreshToken: refresh_token,
       },
     });
+
     return {
       data: {
         message: dict['ようこそ%sさん'][createdUser.locale].replace(
