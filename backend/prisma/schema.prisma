@@ -7,55 +7,79 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model channels {
-  id                 String        @id @default(uuid()) @db.Uuid
-  discord_channel_id String?       @db.VarChar
-  organization_id    String        @db.Uuid
-  organizations      organizations @relation(fields: [organization_id], references: [id], onUpdate: Restrict)
+model Channels {
+  id               String        @id @default(uuid()) @db.Uuid
+  discordChannelId String?       @db.VarChar
+  organizationId   String        @db.Uuid
+  organizations    Organizations @relation(fields: [organizationId], references: [id], onUpdate: Restrict)
+
+  @@map("channels")
 }
 
-model helpdesk_users {
-  id              String        @id @default(uuid()) @db.Uuid
-  organization_id String        @db.Uuid
-  email           String        @db.VarChar
-  name            String        @db.VarChar
-  locale          String        @db.VarChar
-  access_token    String        @db.VarChar
-  refresh_token   String        @db.VarChar
-  created_at      DateTime      @default(now()) @db.Timestamp(6)
-  updated_at      DateTime      @updatedAt
-  organizations   organizations @relation(fields: [organization_id], references: [id], onUpdate: Restrict)
+model HelpdeskUsers {
+  id                 String               @id @default(uuid()) @db.Uuid
+  email              String               @db.VarChar
+  name               String               @db.VarChar
+  locale             String               @db.VarChar
+  accessToken        String               @db.VarChar
+  refreshToken       String               @db.VarChar
+  createdAt          DateTime             @default(now()) @db.Timestamp(6)
+  updatedAt          DateTime             @updatedAt
+  organizations      Organizations?       @relation(fields: [organizationsId], references: [id])
+  organizationsId    String?              @db.Uuid
+  organizationsUsers OrganizationsUsers[]
+
+  @@map("helpdesk_users")
 }
 
-model organizations {
-  id              String            @id(map: "account_companies_pkey") @db.Uuid
-  domain          String            @db.VarChar
-  name            String?           @db.VarChar
-  helpdesk_users  helpdesk_users[]
-  question_sheets question_sheets[]
-  channels        channels[]
+model Organizations {
+  id                 String               @id(map: "account_companies_pkey") @db.Uuid
+  domain             String               @db.VarChar
+  name               String?              @db.VarChar
+  helpdeskUsers      HelpdeskUsers[]
+  questionSheets     QuestionSheets[]
+  channels           Channels[]
+  organizationsUsers OrganizationsUsers[]
+
+  @@map("organizations")
 }
 
-model question_sheets {
-  id              String        @id @default(uuid()) @db.Uuid
-  organization_id String        @db.Uuid
-  structure       Json          @db.Json
-  organizations   organizations @relation(fields: [organization_id], references: [id], onUpdate: Restrict)
-  questions       questions[]
+model OrganizationsUsers {
+  organizationId String        @db.Uuid
+  organization   Organizations @relation(fields: [organizationId], references: [id])
+  helpdeskUserId String        @db.Uuid
+  helpdeskUser   HelpdeskUsers @relation(fields: [helpdeskUserId], references: [id])
+
+  @@id([organizationId, helpdeskUserId])
+  @@map("organizations_users")
 }
 
-model questioners {
+model QuestionSheets {
+  id             String        @id @default(uuid()) @db.Uuid
+  organizationId String        @db.Uuid
+  structure      Json          @db.Json
+  organizations  Organizations @relation(fields: [organizationId], references: [id], onUpdate: Restrict)
+  questions      Questions[]
+
+  @@map("question_sheets")
+}
+
+model Questioners {
   id        String      @id(map: "users_pkey") @default(uuid()) @db.Uuid
   email     String      @db.VarChar
   name      String?     @db.VarChar
-  questions questions[]
+  questions Questions[]
+
+  @@map("questioners")
 }
 
-model questions {
-  id                String          @id @default(uuid()) @db.Uuid
-  questioner_id     String          @db.Uuid
-  content           Json            @db.Json
-  question_sheet_id String          @db.Uuid
-  question_sheets   question_sheets @relation(fields: [question_sheet_id], references: [id], onUpdate: Restrict)
-  questioners       questioners     @relation(fields: [questioner_id], references: [id], onUpdate: Restrict)
+model Questions {
+  id              String         @id @default(uuid()) @db.Uuid
+  questionerId    String         @db.Uuid
+  content         Json           @db.Json
+  questionSheetId String         @db.Uuid
+  questionSheets  QuestionSheets @relation(fields: [questionSheetId], references: [id], onUpdate: Restrict)
+  questioners     Questioners    @relation(fields: [questionerId], references: [id], onUpdate: Restrict)
+
+  @@map("questions")
 }
