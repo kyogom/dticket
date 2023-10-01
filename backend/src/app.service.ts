@@ -63,16 +63,6 @@ export class AppService {
     return (await response).json();
   }
 
-  async fetchMe(access_token: string): Promise<ResponseBodyUsersMe> {
-    return await (
-      await fetch(`${DISCORD_API_ENDPOINT}/users/@me`, {
-        headers: {
-          Authorization: `Bearer ${access_token}`,
-        },
-      })
-    ).json();
-  }
-
   async createUser(body: { code: string; guild_id: string }) {
     const { code, guild_id } = body;
 
@@ -92,7 +82,15 @@ export class AppService {
         redirect_uri: `${HOST_FRONTEND}/oauth/callback`,
       }),
     );
-    const me = await this.fetchMe(access_token);
+
+    const me: ResponseBodyUsersMe = await (
+      await fetch(`${DISCORD_API_ENDPOINT}/users/@me`, {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+        },
+      })
+    ).json();
+
     const createdUser = await this.prisma.helpdeskUsers.create({
       data: {
         accessToken: access_token,
