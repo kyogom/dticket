@@ -138,14 +138,6 @@ export class AppService {
       },
     });
 
-    // const channels: ResponseBodyChannel = await (
-    //   await fetch(`${DISCORD_API_ENDPOINT}/guilds/${guild_id}/channels`, {
-    //     headers: {
-    //       Authorization: `Bearer ${access_token}`,
-    //     },
-    //   })
-    // ).json();
-
     const { t } = new DictService(createdUser.locale);
 
     return {
