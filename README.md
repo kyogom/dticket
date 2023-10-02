@@ -14,6 +14,12 @@
 
 (初回のみ) `heroku git:remote -a discordticket`  
 `git subtree push --prefix backend/ heroku main`
+
+```
+(force push したいとき)
+git push heroku `git subtree split --prefix backend/ main`:main --force
+```
+
 `yarn prisma migrate dev`
 
 ## Frontend
