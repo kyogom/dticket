@@ -1,6 +1,7 @@
 import discord from "./discord.svg";
 import Image from "next/image";
 import { postAuthCode } from "@/lib/fetch";
+import Link from "next/link";
 
 const Callback = async ({
   searchParams,
@@ -18,6 +19,14 @@ const Callback = async ({
         <Image src={discord} alt="Discord Logo" className="w-16 h-16 mb-4" />
         <h1 className="text-2xl font-bold text-gray-600">DiscordTicket</h1>
         <p className="text-gray-600">{message}</p>
+        <Link
+          href={
+            "https://discord.com/oauth2/authorize?client_id=1157162840784908389&scope=bot&permissions=8"
+          }
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        >
+          Next, invite bot.
+        </Link>
       </div>
     </div>
   );
