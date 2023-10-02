@@ -98,24 +98,25 @@ export class AppService {
     }
     const me: ResponseBodyUsersMe = await meResponse.json();
 
-    const guildsResponse = await fetch(
-      `${DISCORD_API_ENDPOINT}/users/@me/guilds?with_counts=true`,
-      {
-        headers: {
-          Authorization: `Bearer ${access_token}`,
-        },
-      },
-    );
+    // NOTE: ギルドの情報は今いらないのでやめる。
+    // const guildsResponse = await fetch(
+    //   `${DISCORD_API_ENDPOINT}/users/@me/guilds?with_counts=true`,
+    //   {
+    //     headers: {
+    //       Authorization: `Bearer ${access_token}`,
+    //     },
+    //   },
+    // );
 
-    if (!guildsResponse.ok) {
-      throw new HttpException(
-        'cannot get guild message:' +
-          JSON.stringify(await guildsResponse.json()),
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-    const guilds: ResponseBodyGuild[] = await guildsResponse.json();
-    const guild = guilds.find((guild) => guild.id === guild_id);
+    // if (!guildsResponse.ok) {
+    //   throw new HttpException(
+    //     'cannot get guild message:' +
+    //       JSON.stringify(await guildsResponse.json()),
+    //     HttpStatus.BAD_REQUEST,
+    //   );
+    // }
+    // const guilds: ResponseBodyGuild[] = await guildsResponse.json();
+    // const guild = guilds.find((guild) => guild.id === guild_id);
 
     const createdUser = await this.prisma.helpdeskUsers.create({
       data: {
@@ -129,9 +130,7 @@ export class AppService {
           create: {
             id: randomUUID(),
             domain: me.username,
-            name: guild.name,
-            icon: guild.icon,
-            systemChannelId: guild.system_channel_id,
+            name: me.username,
           },
         },
         refreshToken: refresh_token,

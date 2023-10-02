@@ -41,7 +41,6 @@ model Organizations {
   domain             String               @db.VarChar
   name               String?              @db.VarChar
   icon               String?              @db.VarChar
-  systemChannelId    String               @db.VarChar
   helpdeskUsers      HelpdeskUsers[]
   questionSheets     QuestionSheets[]
   channels           Channels[]
