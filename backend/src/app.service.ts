@@ -131,6 +131,7 @@ export class AppService {
             domain: me.username,
             name: guild.name,
             icon: guild.icon,
+            systemChannelId: guild.system_channel_id,
           },
         },
         refreshToken: refresh_token,

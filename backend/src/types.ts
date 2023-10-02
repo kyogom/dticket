@@ -38,10 +38,11 @@ export type ResponseBodyUsersMe = {
 };
 
 export type ResponseBodyGuild = {
+  approximate_member_count?: number;
+  icon: string;
   id: string;
   name: string;
-  icon: string;
-  approximate_member_count?: number;
+  system_channel_id?: string;
 };
 
 export type ResponseBodyChannel = Array<{
