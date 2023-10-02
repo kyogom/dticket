@@ -116,6 +116,7 @@ export class AppService {
     // const guilds: ResponseBodyGuild[] = await guildsResponse.json();
     // const guild = guilds.find((guild) => guild.id === guild_id);
 
+    // FIXME: 既にユーザーがある場合はログイン扱い
     const createdUser = await this.prisma.helpdeskUsers.create({
       data: {
         accessToken: access_token,
