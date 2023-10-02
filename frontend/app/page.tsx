@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function Home() {
   const { CLIENT_ID, OAUTH_ENDPOINT, VERCEL_URL } = process.env;
-  const scope = encodeURIComponent("identify email");
+  const scope = encodeURIComponent("identify email applications.commands");
 
   // FIXME: domainに依存
   const redirect_uri = encodeURIComponent(
