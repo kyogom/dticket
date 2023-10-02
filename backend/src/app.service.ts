@@ -20,7 +20,7 @@ export class AppService {
   constructor(private prisma: PrismaService) {}
 
   getHello(): string {
-    return 'Hello World!';
+    return 'Hello World!2';
   }
 
   handleInteractInit(
