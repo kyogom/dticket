@@ -36,3 +36,17 @@ export type ResponseBodyUsersMe = {
   locale: string;
   username: string;
 };
+
+export type ResponseBodyGuild = {
+  id: string;
+  name: string;
+  icon: string;
+  approximate_member_count?: string;
+};
+
+export type ResponseBodyChannel = Array<{
+  id: string;
+  type: number;
+  position: number;
+  name: string;
+}>;

@@ -6,6 +6,8 @@ import {
 } from '@nestjs/common';
 import {
   RequestBodyInteraction,
+  ResponseBodyChannel,
+  ResponseBodyGuild,
   ResponseBodyTokenExchange,
   ResponseBodyUsersMe,
 } from './types';
@@ -91,6 +93,17 @@ export class AppService {
       })
     ).json();
 
+    const guild: ResponseBodyGuild = await (
+      await fetch(
+        `${DISCORD_API_ENDPOINT}/guilds/${guild_id}?with_counts=true`,
+        {
+          headers: {
+            Authorization: `Bearer ${access_token}`,
+          },
+        },
+      )
+    ).json();
+
     const createdUser = await this.prisma.helpdeskUsers.create({
       data: {
         accessToken: access_token,
@@ -101,11 +114,22 @@ export class AppService {
           create: {
             id: randomUUID(),
             domain: me.username,
+            name: guild.name,
+            icon: guild.icon,
           },
         },
         refreshToken: refresh_token,
       },
     });
+
+    const channels: ResponseBodyChannel = await (
+      await fetch(`${DISCORD_API_ENDPOINT}/guilds/${guild_id}channels`, {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+        },
+      })
+    ).json();
+    console.log(channels);
 
     const { t } = new DictService(createdUser.locale);
 

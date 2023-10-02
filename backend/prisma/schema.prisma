@@ -10,6 +10,7 @@ datasource db {
 model Channels {
   id               String        @id @default(uuid()) @db.Uuid
   discordChannelId String?       @db.VarChar
+  name             String        @db.VarChar
   organizationId   String        @db.Uuid
   organizations    Organizations @relation(fields: [organizationId], references: [id], onUpdate: Restrict)
 
@@ -23,6 +24,7 @@ model HelpdeskUsers {
   locale             String               @db.VarChar
   accessToken        String               @db.VarChar
   refreshToken       String               @db.VarChar
+  icon               String?              @db.VarChar
   createdAt          DateTime             @default(now()) @db.Timestamp(6)
   updatedAt          DateTime             @updatedAt
   organizations      Organizations?       @relation(fields: [organizationsId], references: [id])
@@ -34,8 +36,10 @@ model HelpdeskUsers {
 
 model Organizations {
   id                 String               @id(map: "account_companies_pkey") @db.Uuid
+  guildId            String?              @db.VarChar // 1組織1サーバーにする
   domain             String               @db.VarChar
   name               String?              @db.VarChar
+  icon               String?              @db.VarChar
   helpdeskUsers      HelpdeskUsers[]
   questionSheets     QuestionSheets[]
   channels           Channels[]
