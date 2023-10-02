@@ -9,7 +9,7 @@ import {
   ResponseBodyTokenExchange,
   ResponseBodyUsersMe,
 } from './types';
-import { BOT_PUBLIC_KEY, DISCORD_API_ENDPOINT } from './consts';
+import { DISCORD_API_ENDPOINT } from './consts';
 import {
   InteractionResponseType,
   InteractionType,
@@ -27,16 +27,20 @@ export class AppService {
     return 'Hello World!2';
   }
 
-  handleInteractInit(
+  async handleInteractInit(
     req: RawBodyRequest<Request>,
-    body: RequestBodyInteraction,
+    body: RequestBodyInteraction & { webhookTest: boolean },
   ) {
     const signature = req.headers['x-signature-ed25519'] ?? '';
     const timestamp = req.headers['x-signature-timestamp'] ?? '';
     const rawBody = req.rawBody;
-    const isVerified = verifyKey(rawBody, signature, timestamp, BOT_PUBLIC_KEY);
+    const isVerified = verifyKey(
+      rawBody,
+      signature,
+      timestamp,
+      process.env.BOT_PUBLIC_KEY,
+    );
 
-    // https://discord.com/developers/docs/interactions/receiving-and-responding#security-and-authorization
     if (!isVerified) {
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
     }
@@ -47,14 +51,12 @@ export class AppService {
       };
     }
 
-    // TODO: コマンドを受け取ってハンドリングする
     if (body.type === InteractionType.APPLICATION_COMMAND) {
-      console.log(body);
       return {
         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
         data: {
           // TODO: 多言語対応
-          content: '選択されたメッセージをメールで返信しました！',
+          content: 'done',
         },
       };
     }
@@ -79,15 +81,20 @@ export class AppService {
     return (await response).json();
   }
 
-  async createUser(body: { code: string }) {
-    const { code } = body;
+  async createUser(body: { code: string; guild_id: string }) {
+    const { code, guild_id } = body;
 
     if (typeof code !== 'string') {
       throw new HttpException('Bad Request', HttpStatus.BAD_REQUEST);
     }
 
-    const { DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET, HOST_FRONTEND } =
-      process.env;
+    const {
+      APPLICATION_ID,
+      BOT_TOKEN,
+      DISCORD_CLIENT_ID,
+      DISCORD_CLIENT_SECRET,
+      HOST_FRONTEND,
+    } = process.env;
 
     const { access_token, refresh_token } = await this.getToken(
       new URLSearchParams({
@@ -112,51 +119,66 @@ export class AppService {
     }
     const me: ResponseBodyUsersMe = await meResponse.json();
 
-    // NOTE: ギルドの情報は今いらないのでやめる。
-    // const guildsResponse = await fetch(
-    //   `${DISCORD_API_ENDPOINT}/users/@me/guilds?with_counts=true`,
-    //   {
-    //     headers: {
-    //       Authorization: `Bearer ${access_token}`,
-    //     },
-    //   },
-    // );
-
-    // if (!guildsResponse.ok) {
-    //   throw new HttpException(
-    //     'cannot get guild message:' +
-    //       JSON.stringify(await guildsResponse.json()),
-    //     HttpStatus.BAD_REQUEST,
-    //   );
-    // }
-    // const guilds: ResponseBodyGuild[] = await guildsResponse.json();
-    // const guild = guilds.find((guild) => guild.id === guild_id);
-
-    // FIXME: 既にユーザーがある場合はログイン扱い
-    const createdUser = await this.prisma.helpdeskUsers.create({
-      data: {
-        accessToken: access_token,
+    const existingUser = await this.prisma.helpdeskUsers.findUnique({
+      where: {
         discordId: me.id,
-        email: me.email,
-        icon: me.avatar,
-        locale: me.locale,
-        name: me.username,
-        organizations: {
-          create: {
-            id: randomUUID(),
-            domain: me.username,
-            name: me.username,
-          },
-        },
-        refreshToken: refresh_token,
       },
     });
+    if (existingUser === null) {
+      await this.prisma.helpdeskUsers.create({
+        data: {
+          accessToken: access_token,
+          discordId: me.id,
+          email: me.email,
+          icon: me.avatar,
+          locale: me.locale,
+          name: me.username,
+          organizations: {
+            create: {
+              id: randomUUID(),
+              domain: me.username,
+              name: me.username,
+            },
+          },
+          refreshToken: refresh_token,
+        },
+      });
+    }
 
-    const { t } = new DictService(createdUser.locale);
+    const { t } = new DictService(me.locale);
+
+    // TODO: コマンドIDなどをDBに保存する?
+    const commandResponse = await fetch(
+      `${DISCORD_API_ENDPOINT}/applications/${APPLICATION_ID}/guilds/${guild_id}/commands`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bot ' + BOT_TOKEN,
+        },
+        body: JSON.stringify({
+          type: 3,
+          name: 'Send this message via email',
+          name_localizations: {
+            ja: 'メールで返信',
+            'en-US': 'Send this message via email',
+            'en-GB': 'Send this message via email',
+          },
+        }),
+      },
+    );
+    if (!commandResponse.ok) {
+      throw new HttpException(
+        'cannot create command:' + JSON.stringify(await commandResponse.json()),
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    // TODO: Webhookを作る。WebhookIDなどをDBに保存する
 
     return {
       data: {
-        message: t('ようこそ%sさん', [createdUser.name]),
+        message: t('ようこそ%sさん', [me.username]),
       },
     };
   }
