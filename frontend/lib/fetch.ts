@@ -7,21 +7,18 @@ export const postAuthCode = async ({
   code: string;
   guild_id: string;
 }): Promise<{ message: string }> => {
-  try {
-    const response = await fetch(`${API_BASE_URL}/authorize`, {
-      method: "POST",
-      body: JSON.stringify({ code, guild_id }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    if (!response.ok) {
-      throw new Error("Network response was not ok");
-    }
-    const { data } = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Error fetching data:", error);
-    throw error;
+  const response = await fetch(`${API_BASE_URL}/authorize`, {
+    method: "POST",
+    body: JSON.stringify({ code, guild_id }),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  if (!response.ok) {
+    console.error(await response.json());
+    // FIXME: Errorを投げてもvercelのコンソールに出ない
+    throw new Error((await response.json()).message);
   }
+  const { data } = await response.json();
+  return data;
 };

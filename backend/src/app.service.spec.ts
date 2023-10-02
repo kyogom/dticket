@@ -2,10 +2,18 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AppModule } from './app.module';
 import { AppService } from './app.service';
 
+const fetch = (global.fetch = jest.fn());
 describe('AppService', () => {
   let appService: AppService;
 
   const mockData = {
+    channels: {},
+    guild: {
+      id: 'bcdc90ec-259e-4bf9-a89b-c1b56fb94c58',
+      name: 'hello',
+      icon: '26444d28-bb54-4887-ac3b-2cafcdfe74a9',
+      approximate_member_count: 10,
+    },
     me: {
       avatar: 'avatar',
       email: 'exmaple@email.com',
@@ -37,7 +45,7 @@ describe('AppService', () => {
     });
   };
   const mockGetMe = () => {
-    global.fetch = jest.fn().mockResolvedValueOnce({
+    fetch.mockResolvedValueOnce({
       ok: true,
       json: () => {
         return mockData.me;
@@ -45,10 +53,31 @@ describe('AppService', () => {
     });
   };
 
+  const mockGetGuild = () => {
+    fetch.mockResolvedValueOnce({
+      ok: true,
+      json: () => {
+        return mockData.me;
+      },
+    });
+  };
+
+  const mockGetChannels = () => {
+    fetch.mockResolvedValueOnce({
+      ok: true,
+      json: () => {
+        return mockData.channels;
+      },
+    });
+  };
+
   describe('createUser', () => {
+    // FIXME: prismaもモックする
     it('should return ja createdUser', async () => {
       mockGetToken();
       mockGetMe();
+      mockGetGuild();
+      mockGetChannels();
 
       return expect(
         await appService.createUser(mockData.createUserParam),
@@ -61,9 +90,12 @@ describe('AppService', () => {
   });
 
   describe('createUser', () => {
+    // FIXME: prismaもモックする
     it('should return ja createdUser', async () => {
       mockGetToken();
       mockGetMe();
+      mockGetGuild();
+      mockGetChannels();
       mockData.me.locale = 'en';
 
       return expect(

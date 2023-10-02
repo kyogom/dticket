@@ -41,7 +41,7 @@ export type ResponseBodyGuild = {
   id: string;
   name: string;
   icon: string;
-  approximate_member_count?: string;
+  approximate_member_count?: number;
 };
 
 export type ResponseBodyChannel = Array<{

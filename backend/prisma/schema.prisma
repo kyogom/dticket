@@ -19,6 +19,7 @@ model Channels {
 
 model HelpdeskUsers {
   id                 String               @id @default(uuid()) @db.Uuid
+  discordId          String               @unique @db.VarChar
   email              String               @db.VarChar
   name               String               @db.VarChar
   locale             String               @db.VarChar

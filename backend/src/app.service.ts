@@ -85,29 +85,44 @@ export class AppService {
       }),
     );
 
-    const me: ResponseBodyUsersMe = await (
-      await fetch(`${DISCORD_API_ENDPOINT}/users/@me`, {
+    const meResponse = await fetch(`${DISCORD_API_ENDPOINT}/users/@me`, {
+      headers: {
+        Authorization: `Bearer ${access_token}`,
+      },
+    });
+    if (!meResponse.ok) {
+      throw new HttpException(
+        'cannot get me message:' + JSON.stringify(await meResponse.json()),
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    const me: ResponseBodyUsersMe = await meResponse.json();
+
+    const guildsResponse = await fetch(
+      `${DISCORD_API_ENDPOINT}/users/@me/guilds?with_counts=true`,
+      {
         headers: {
           Authorization: `Bearer ${access_token}`,
         },
-      })
-    ).json();
+      },
+    );
 
-    const guild: ResponseBodyGuild = await (
-      await fetch(
-        `${DISCORD_API_ENDPOINT}/guilds/${guild_id}?with_counts=true`,
-        {
-          headers: {
-            Authorization: `Bearer ${access_token}`,
-          },
-        },
-      )
-    ).json();
+    if (!guildsResponse.ok) {
+      throw new HttpException(
+        'cannot get guild message:' +
+          JSON.stringify(await guildsResponse.json()),
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    const guilds: ResponseBodyGuild[] = await guildsResponse.json();
+    const guild = guilds.find((guild) => guild.id === guild_id);
 
     const createdUser = await this.prisma.helpdeskUsers.create({
       data: {
         accessToken: access_token,
+        discordId: me.id,
         email: me.email,
+        icon: me.avatar,
         locale: me.locale,
         name: me.username,
         organizations: {
@@ -122,14 +137,13 @@ export class AppService {
       },
     });
 
-    const channels: ResponseBodyChannel = await (
-      await fetch(`${DISCORD_API_ENDPOINT}/guilds/${guild_id}channels`, {
-        headers: {
-          Authorization: `Bearer ${access_token}`,
-        },
-      })
-    ).json();
-    console.log(channels);
+    // const channels: ResponseBodyChannel = await (
+    //   await fetch(`${DISCORD_API_ENDPOINT}/guilds/${guild_id}/channels`, {
+    //     headers: {
+    //       Authorization: `Bearer ${access_token}`,
+    //     },
+    //   })
+    // ).json();
 
     const { t } = new DictService(createdUser.locale);
 
