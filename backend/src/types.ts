@@ -51,3 +51,35 @@ export type ResponseBodyChannel = Array<{
   position: number;
   name: string;
 }>;
+
+type LocalizationDict = {
+  [key in 'ja' | 'en-GB' | 'en-US']: string;
+};
+
+export type RequestBodyCommand = {
+  id?: string;
+  type: 3; // A UI-based command that shows up when you right click or tap on a message
+  application_id?: string;
+  guild_id?: string;
+  name: string;
+  name_localizations: LocalizationDict;
+  description: string;
+  description_localizations: LocalizationDict;
+};
+
+// FIXME:あとで消す
+export const test: RequestBodyCommand = {
+  type: 3,
+  name: 'Send this message via email',
+  name_localizations: {
+    ja: 'このメッセージをメールを送信',
+    'en-US': 'Send this message via email',
+    'en-GB': 'Send this message via email',
+  },
+  description: 'Send this message via email to reply customers request above.',
+  description_localizations: {
+    ja: 'メールを送信',
+    'en-US': 'Send email',
+    'en-GB': 'Send email',
+  },
+};

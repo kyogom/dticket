@@ -10,7 +10,11 @@ import {
   ResponseBodyUsersMe,
 } from './types';
 import { BOT_PUBLIC_KEY, DISCORD_API_ENDPOINT } from './consts';
-import { InteractionResponseType, verifyKey } from 'discord-interactions';
+import {
+  InteractionResponseType,
+  InteractionType,
+  verifyKey,
+} from 'discord-interactions';
 import { PrismaService } from './prisma.service';
 import { randomUUID } from 'crypto';
 import DictService from './dict.service';
@@ -37,9 +41,21 @@ export class AppService {
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
     }
 
-    if (body.type === InteractionResponseType.PONG) {
+    if (body.type === InteractionType.PING) {
       return {
         type: InteractionResponseType.PONG,
+      };
+    }
+
+    // TODO: コマンドを受け取ってハンドリングする
+    if (body.type === InteractionType.APPLICATION_COMMAND) {
+      console.log(body);
+      return {
+        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+        data: {
+          // TODO: 多言語対応
+          content: '選択されたメッセージをメールで返信しました！',
+        },
       };
     }
 
