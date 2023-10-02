@@ -6,8 +6,6 @@ import {
 } from '@nestjs/common';
 import {
   RequestBodyInteraction,
-  ResponseBodyChannel,
-  ResponseBodyGuild,
   ResponseBodyTokenExchange,
   ResponseBodyUsersMe,
 } from './types';
