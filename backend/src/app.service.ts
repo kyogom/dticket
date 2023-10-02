@@ -11,9 +11,9 @@ import {
 } from './types';
 import { BOT_PUBLIC_KEY, DISCORD_API_ENDPOINT } from './consts';
 import { InteractionResponseType, verifyKey } from 'discord-interactions';
-import dict from './dict';
 import { PrismaService } from './prisma.service';
 import { randomUUID } from 'crypto';
+import DictService from './dict.service';
 
 @Injectable()
 export class AppService {
@@ -107,12 +107,11 @@ export class AppService {
       },
     });
 
+    const { t } = new DictService(createdUser.locale);
+
     return {
       data: {
-        message: dict['ようこそ%sさん'][createdUser.locale].replace(
-          '%s',
-          createdUser.name,
-        ),
+        message: t('ようこそ%sさん', [createdUser.name]),
       },
     };
   }
