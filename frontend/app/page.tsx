@@ -1,9 +1,13 @@
 import Link from "next/link";
 
 export default function Home() {
-  const { OAUTH_ENDPOINT, CLIENT_ID } = process.env;
-  const scope = "identify%20email";
-  const link = `${OAUTH_ENDPOINT}?client_id=${CLIENT_ID}&redirect_uri=${"https%3A%2F%2Fdticket.vercel.app%2Foauth%2Fcallback"}&response_type=code&scope=${scope}`;
+  const { CLIENT_ID, OAUTH_ENDPOINT, VERCEL_URL } = process.env;
+  const scope = encodeURIComponent("identify email");
+  const redirect_uri = encodeURIComponent(
+    `https://${VERCEL_URL}/oauth/callback`
+  );
+
+  const link = `${OAUTH_ENDPOINT}?client_id=${CLIENT_ID}&redirect_uri=${redirect_uri}&response_type=code&scope=${scope}`;
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <Link
