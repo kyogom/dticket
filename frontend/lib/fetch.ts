@@ -2,14 +2,12 @@ const { API_BASE_URL } = process.env;
 
 export const postAuthCode = async ({
   code,
-  guild_id,
 }: {
   code: string;
-  guild_id: string;
 }): Promise<{ message: string }> => {
   const response = await fetch(`${API_BASE_URL}/authorize`, {
     method: "POST",
-    body: JSON.stringify({ code, guild_id }),
+    body: JSON.stringify({ code }),
     headers: {
       "Content-Type": "application/json",
     },

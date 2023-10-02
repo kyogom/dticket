@@ -63,10 +63,10 @@ export class AppService {
     return (await response).json();
   }
 
-  async createUser(body: { code: string; guild_id: string }) {
-    const { code, guild_id } = body;
+  async createUser(body: { code: string }) {
+    const { code } = body;
 
-    if (typeof code !== 'string' || typeof guild_id !== 'string') {
+    if (typeof code !== 'string') {
       throw new HttpException('Bad Request', HttpStatus.BAD_REQUEST);
     }
 
