@@ -4,6 +4,7 @@ import { DISCORD_API_ENDPOINT } from './consts';
 import { randomUUID } from 'crypto';
 import DictService from './dict.service';
 import prisma from '../prisma/client';
+import wrappedFetch from './fetchClient';
 
 @Injectable()
 export class AppService {
@@ -14,19 +15,16 @@ export class AppService {
   }
 
   async getToken(data: URLSearchParams): Promise<ResponseBodyTokenExchange> {
-    const response = await fetch(`${DISCORD_API_ENDPOINT}/oauth2/token`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
+    const response = await wrappedFetch(
+      `${DISCORD_API_ENDPOINT}/oauth2/token`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: data,
       },
-      body: data,
-    });
-    if (!response.ok) {
-      throw new HttpException(
-        JSON.stringify(response.json()),
-        HttpStatus.BAD_REQUEST,
-      );
-    }
+    );
     return (await response).json();
   }
 
@@ -55,17 +53,11 @@ export class AppService {
       }),
     );
 
-    const meResponse = await fetch(`${DISCORD_API_ENDPOINT}/users/@me`, {
+    const meResponse = await wrappedFetch(`${DISCORD_API_ENDPOINT}/users/@me`, {
       headers: {
         Authorization: `Bearer ${access_token}`,
       },
     });
-    if (!meResponse.ok) {
-      throw new HttpException(
-        JSON.stringify(await meResponse.json()),
-        HttpStatus.BAD_REQUEST,
-      );
-    }
     const me: ResponseBodyUsersMe = await meResponse.json();
 
     const existingUser = await prisma.helpdeskUsers.findFirst({
@@ -99,7 +91,7 @@ export class AppService {
     const { t } = new DictService(me.locale);
 
     // TODO: コマンドIDなどをDBに保存する?
-    const commandResponse = await fetch(
+    const commandResponse = await wrappedFetch(
       `${DISCORD_API_ENDPOINT}/applications/${APPLICATION_ID}/guilds/${guild_id}/commands`,
       {
         method: 'POST',
@@ -118,12 +110,6 @@ export class AppService {
         }),
       },
     );
-    if (!commandResponse.ok) {
-      throw new HttpException(
-        JSON.stringify(await commandResponse.json()),
-        HttpStatus.BAD_REQUEST,
-      );
-    }
 
     // TODO: Webhookを作る。WebhookIDなどをDBに保存する
 
