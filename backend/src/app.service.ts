@@ -7,8 +7,8 @@ import {
 import { DISCORD_API_ENDPOINT } from './consts';
 import { randomUUID } from 'crypto';
 import DictService from './dict.service';
-import prisma from '../prisma/client';
-import wrappedFetch from './fetchClient';
+import prisma from './prisma_client/client';
+import wrappedFetch from './fetch_client';
 
 const {
   APPLICATION_ID,

@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AppModule } from './app.module';
 import { AppService } from './app.service';
-import mockData from './mockData';
+import mockData from './mock_data';
 
 // Prepare Mock
 const fetch = (global.fetch = jest.fn());
