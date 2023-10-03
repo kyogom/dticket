@@ -143,6 +143,8 @@ export class AppService {
           refreshToken: refresh_token,
         },
       });
+    } else {
+      // TODO: updateしたい
     }
 
     const { t } = new DictService(me.locale);
