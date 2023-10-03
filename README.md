@@ -10,6 +10,11 @@
 `yarn dev`
 `yarn prisma migrate reset`
 
+### Test
+
+`yarn test`
+`yarn test:e2e`
+
 ### Deploy
 
 (初回のみ) `heroku git:remote -a discordticket`  

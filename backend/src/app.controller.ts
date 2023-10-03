@@ -1,10 +1,9 @@
 import {
   Body,
   Controller,
-  Get,
+  HttpException,
+  HttpStatus,
   Post,
-  RawBodyRequest,
-  Req,
 } from '@nestjs/common';
 import { AppService } from './app.service';
 
@@ -12,18 +11,14 @@ import { AppService } from './app.service';
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @Get()
-  getHello(): string {
-    return this.appService.getHello();
-  }
-
-  @Post('api/interactions')
-  interact(@Req() req: RawBodyRequest<Request>, @Body() body): any {
-    return this.appService.handleInteractInit(req, body);
-  }
-
   @Post('api/authorize')
   createUser(@Body() body): any {
-    return this.appService.createUser(body);
+    const { code, guild_id } = body;
+
+    if (typeof code !== 'string' || typeof guild_id !== 'string') {
+      throw new HttpException('Bad Request', HttpStatus.BAD_REQUEST);
+    }
+
+    return this.appService.createUser(code, guild_id);
   }
 }

@@ -1,17 +1,17 @@
 export type RequestBodyInteraction = {
   // https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object
   app_permissions?: any;
-  application_id: string;
+  application_id?: string;
   channel_id?: any;
   channel?: any;
-  data: any;
-  entitlements: any;
+  data?: any;
+  entitlements?: any;
   guild_id?: string;
-  id: string;
-  token: string;
+  id?: string;
+  token?: string;
   type: number;
-  user: RequestBodyInteractionUser;
-  version: number;
+  user?: RequestBodyInteractionUser;
+  version?: number;
 };
 
 export type RequestBodyInteractionUser = {
@@ -23,10 +23,10 @@ export type RequestBodyInteractionUser = {
 
 export type ResponseBodyTokenExchange = {
   access_token: string;
-  expires_in: number;
   refresh_token: string;
-  scope: string;
-  token_type: string;
+  // expires_in: number;
+  // scope: string;
+  // token_type: string;
 };
 
 export type ResponseBodyUsersMe = {
@@ -67,19 +67,11 @@ export type RequestBodyCommand = {
   description_localizations: LocalizationDict;
 };
 
-// FIXME:あとで消す
-export const test: RequestBodyCommand = {
-  type: 3,
-  name: 'Send this message via email',
-  name_localizations: {
-    ja: 'このメッセージをメールを送信',
-    'en-US': 'Send this message via email',
-    'en-GB': 'Send this message via email',
-  },
-  description: 'Send this message via email to reply customers request above.',
-  description_localizations: {
-    ja: 'メールを送信',
-    'en-US': 'Send email',
-    'en-GB': 'Send email',
-  },
+export type ResponseBodyCommand = {
+  id: string;
+  application_id: string;
+  version: string;
+  type: string;
+  name: string;
+  guild_id: string;
 };
