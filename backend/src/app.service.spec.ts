@@ -2,13 +2,6 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AppModule } from './app.module';
 import { AppService } from './app.service';
 import mockData from './mockData';
-import {
-  InteractionResponseType,
-  InteractionType,
-  verifyKey,
-} from 'discord-interactions';
-import { createRequest } from 'node-mocks-http';
-import { RawBodyRequest } from '@nestjs/common';
 
 // Prepare Mock
 const fetch = (global.fetch = jest.fn());
@@ -47,25 +40,6 @@ describe('AppService', () => {
       },
     });
   };
-
-  describe('handleIncomingWebhook', () => {
-    it('should PONG', async () => {
-      (verifyKey as any).mockReturnValue(true);
-      const req = createRequest({
-        method: 'POST',
-      });
-      return expect(
-        await appService.handleIncomingWebhook(
-          req as unknown as RawBodyRequest<Request>,
-          {
-            type: InteractionType.PING,
-          },
-        ),
-      ).toEqual({
-        type: InteractionResponseType.PONG,
-      });
-    });
-  });
 
   describe('createUser', () => {
     it('should return ja createdUser', async () => {

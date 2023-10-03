@@ -4,10 +4,12 @@ import * as request from 'supertest';
 import { AppModule } from './../src/app.module';
 import { AppService } from './../src/app.service';
 import { InteractionResponseType, InteractionType } from 'discord-interactions';
+import { InteractionsService } from './../src/interactions/interactions.service';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;
   let appService: AppService;
+  let interactionsService: InteractionsService;
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -17,11 +19,12 @@ describe('AppController (e2e)', () => {
     app = moduleFixture.createNestApplication();
     await app.init();
     appService = app.get<AppService>(AppService);
+    interactionsService = app.get<InteractionsService>(InteractionsService);
   });
 
   it('/api/interactions (POST | verify)', () => {
     jest
-      .spyOn(appService, 'handleIncomingWebhook')
+      .spyOn(interactionsService, 'handleIncomingWebhook')
       .mockResolvedValue({ type: InteractionResponseType.PONG });
     return request(app.getHttpServer())
       .post('/api/interactions')
@@ -30,7 +33,7 @@ describe('AppController (e2e)', () => {
   });
 
   it('/api/interactions (POST | handle command)', () => {
-    jest.spyOn(appService, 'handleIncomingWebhook').mockResolvedValue({
+    jest.spyOn(interactionsService, 'handleIncomingWebhook').mockResolvedValue({
       type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
       data: {
         content: 'done',
