@@ -1,17 +1,17 @@
 export type RequestBodyInteraction = {
   // https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object
   app_permissions?: any;
-  application_id: string;
+  application_id?: string;
   channel_id?: any;
   channel?: any;
-  data: any;
-  entitlements: any;
+  data?: any;
+  entitlements?: any;
   guild_id?: string;
-  id: string;
-  token: string;
+  id?: string;
+  token?: string;
   type: number;
-  user: RequestBodyInteractionUser;
-  version: number;
+  user?: RequestBodyInteractionUser;
+  version?: number;
 };
 
 export type RequestBodyInteractionUser = {
@@ -23,10 +23,10 @@ export type RequestBodyInteractionUser = {
 
 export type ResponseBodyTokenExchange = {
   access_token: string;
-  expires_in: number;
   refresh_token: string;
-  scope: string;
-  token_type: string;
+  // expires_in: number;
+  // scope: string;
+  // token_type: string;
 };
 
 export type ResponseBodyUsersMe = {

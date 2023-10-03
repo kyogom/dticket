@@ -1,41 +1,21 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AppModule } from './app.module';
 import { AppService } from './app.service';
+import mockData from './mockData';
+import {
+  InteractionResponseType,
+  InteractionType,
+  verifyKey,
+} from 'discord-interactions';
+import { createRequest } from 'node-mocks-http';
+import { RawBodyRequest } from '@nestjs/common';
 
+// Prepare Mock
 const fetch = (global.fetch = jest.fn());
+jest.mock('discord-interactions');
+
 describe('AppService', () => {
   let appService: AppService;
-
-  const mockData = {
-    command: {
-      id: '1158560657030004736',
-      application_id: '1158543325788389406',
-      version: '1158560657030004737',
-      default_member_permissions: null,
-      type: 3,
-      name: 'Send this message via email',
-      name_localizations: {
-        ja: 'メールで返信',
-        'en-US': 'Send this message via email',
-        'en-GB': 'Send this message via email',
-      },
-      description: '',
-      description_localizations: null,
-      guild_id: '959619584644776028',
-      nsfw: false,
-    },
-    me: {
-      avatar: 'avatar',
-      email: 'exmaple@email.com',
-      id: 'd23ac22a-38f9-4dbb-b426-a9c8d2a2e396',
-      locale: 'ja',
-      username: 'kyogo',
-    },
-    createUserParam: {
-      code: 'example',
-      guild_id: 'example',
-    },
-  };
 
   beforeEach(async () => {
     const app: TestingModule = await Test.createTestingModule({
@@ -47,10 +27,7 @@ describe('AppService', () => {
   const mockGetToken = () => {
     jest.spyOn(appService, 'getToken').mockResolvedValueOnce({
       access_token: 'example_access_token',
-      expires_in: 3600,
       refresh_token: 'example_refresh_token',
-      scope: 'example_scope',
-      token_type: 'Bearer',
     });
   };
   const mockGetMe = () => {
@@ -71,8 +48,26 @@ describe('AppService', () => {
     });
   };
 
+  describe('handleIncomingWebhook', () => {
+    it('should PONG', async () => {
+      (verifyKey as any).mockReturnValue(true);
+      const req = createRequest({
+        method: 'POST',
+      });
+      return expect(
+        await appService.handleIncomingWebhook(
+          req as unknown as RawBodyRequest<Request>,
+          {
+            type: InteractionType.PING,
+          },
+        ),
+      ).toEqual({
+        type: InteractionResponseType.PONG,
+      });
+    });
+  });
+
   describe('createUser', () => {
-    // FIXME: prismaもモックする
     it('should return ja createdUser', async () => {
       mockGetToken();
       mockGetMe();
@@ -89,7 +84,6 @@ describe('AppService', () => {
   });
 
   describe('createUser', () => {
-    // FIXME: prismaもモックする
     it('should return en createdUser', async () => {
       mockGetToken();
       mockGetMe();

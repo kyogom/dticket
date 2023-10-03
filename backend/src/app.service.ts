@@ -27,7 +27,7 @@ export class AppService {
     return 'Hello World!';
   }
 
-  async handleInteractInit(
+  async handleIncomingWebhook(
     req: RawBodyRequest<Request>,
     body: RequestBodyInteraction,
   ) {
@@ -74,7 +74,7 @@ export class AppService {
     });
     if (!response.ok) {
       throw new HttpException(
-        'cannot get token message:' + JSON.stringify(response.json()),
+        JSON.stringify(response.json()),
         HttpStatus.BAD_REQUEST,
       );
     }
@@ -84,7 +84,7 @@ export class AppService {
   async createUser(body: { code: string; guild_id: string }) {
     const { code, guild_id } = body;
 
-    if (typeof code !== 'string') {
+    if (typeof code !== 'string' || typeof guild_id !== 'string') {
       throw new HttpException('Bad Request', HttpStatus.BAD_REQUEST);
     }
 
@@ -113,7 +113,7 @@ export class AppService {
     });
     if (!meResponse.ok) {
       throw new HttpException(
-        'cannot get me message:' + JSON.stringify(await meResponse.json()),
+        JSON.stringify(await meResponse.json()),
         HttpStatus.BAD_REQUEST,
       );
     }
@@ -171,7 +171,7 @@ export class AppService {
     );
     if (!commandResponse.ok) {
       throw new HttpException(
-        'cannot create command:' + JSON.stringify(await commandResponse.json()),
+        JSON.stringify(await commandResponse.json()),
         HttpStatus.BAD_REQUEST,
       );
     }

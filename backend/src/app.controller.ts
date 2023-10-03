@@ -19,7 +19,7 @@ export class AppController {
 
   @Post('api/interactions')
   interact(@Req() req: RawBodyRequest<Request>, @Body() body): any {
-    return this.appService.handleInteractInit(req, body);
+    return this.appService.handleIncomingWebhook(req, body);
   }
 
   @Post('api/authorize')
