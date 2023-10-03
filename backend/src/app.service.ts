@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import {
   ResponseBodyCommand,
   ResponseBodyTokenExchange,
@@ -20,13 +20,7 @@ const {
 
 @Injectable()
 export class AppService {
-  async createUser(body: { code: string; guild_id: string }) {
-    const { code, guild_id } = body;
-
-    if (typeof code !== 'string' || typeof guild_id !== 'string') {
-      throw new HttpException('Bad Request', HttpStatus.BAD_REQUEST);
-    }
-
+  async createUser(code: string, guild_id: string) {
     const { access_token, refresh_token } =
       await wrappedFetch<ResponseBodyTokenExchange>(
         `${DISCORD_API_ENDPOINT}/oauth2/token`,

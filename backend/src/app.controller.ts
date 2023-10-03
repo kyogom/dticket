@@ -1,4 +1,10 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  HttpException,
+  HttpStatus,
+  Post,
+} from '@nestjs/common';
 import { AppService } from './app.service';
 
 @Controller()
@@ -7,6 +13,12 @@ export class AppController {
 
   @Post('api/authorize')
   createUser(@Body() body): any {
-    return this.appService.createUser(body);
+    const { code, guild_id } = body;
+
+    if (typeof code !== 'string' || typeof guild_id !== 'string') {
+      throw new HttpException('Bad Request', HttpStatus.BAD_REQUEST);
+    }
+
+    return this.appService.createUser(code, guild_id);
   }
 }

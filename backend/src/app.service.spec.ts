@@ -49,9 +49,8 @@ describe('AppService', () => {
       mockGetMe();
       mockPostCommand();
 
-      return expect(
-        await appService.createUser(mockData.createUserParam),
-      ).toEqual({
+      const { code, guild_id } = mockData.createUserParam;
+      return expect(await appService.createUser(code, guild_id)).toEqual({
         data: {
           message: `ようこそ${mockData.me.username}さん`,
         },
@@ -66,9 +65,8 @@ describe('AppService', () => {
       mockPostCommand();
       mockData.me.locale = 'en';
 
-      return expect(
-        await appService.createUser(mockData.createUserParam),
-      ).toEqual({
+      const { code, guild_id } = mockData.createUserParam;
+      return expect(await appService.createUser(code, guild_id)).toEqual({
         data: {
           message: `${mockData.me.username}, Welcome to DiscordTicket`,
         },
