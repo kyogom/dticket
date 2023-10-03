@@ -67,19 +67,11 @@ export type RequestBodyCommand = {
   description_localizations: LocalizationDict;
 };
 
-// FIXME:あとで消す
-export const test: RequestBodyCommand = {
-  type: 3,
-  name: 'Send this message via email',
-  name_localizations: {
-    ja: 'このメッセージをメールを送信',
-    'en-US': 'Send this message via email',
-    'en-GB': 'Send this message via email',
-  },
-  description: 'Send this message via email to reply customers request above.',
-  description_localizations: {
-    ja: 'メールを送信',
-    'en-US': 'Send email',
-    'en-GB': 'Send email',
-  },
+export type ResponseBodyCommand = {
+  id: string;
+  application_id: string;
+  version: string;
+  type: string;
+  name: string;
+  guild_id: string;
 };

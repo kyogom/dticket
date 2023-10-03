@@ -27,6 +27,10 @@ const mockData = {
     code: 'example',
     guild_id: 'example',
   },
+  token: {
+    access_token: 'c460111e-af77-425e-98a4-8c97cd702424',
+    refresh_token: '5772952a-f6f7-44ec-84c5-5d1b66fe4814',
+  },
 };
 
 export default mockData;

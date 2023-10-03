@@ -1,5 +1,9 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { ResponseBodyTokenExchange, ResponseBodyUsersMe } from './types';
+import {
+  ResponseBodyCommand,
+  ResponseBodyTokenExchange,
+  ResponseBodyUsersMe,
+} from './types';
 import { DISCORD_API_ENDPOINT } from './consts';
 import { randomUUID } from 'crypto';
 import DictService from './dict.service';
@@ -8,26 +12,6 @@ import wrappedFetch from './fetchClient';
 
 @Injectable()
 export class AppService {
-  constructor() {}
-
-  getHello(): string {
-    return 'Hello World!';
-  }
-
-  async getToken(data: URLSearchParams): Promise<ResponseBodyTokenExchange> {
-    const response = await wrappedFetch(
-      `${DISCORD_API_ENDPOINT}/oauth2/token`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: data,
-      },
-    );
-    return (await response).json();
-  }
-
   async createUser(body: { code: string; guild_id: string }) {
     const { code, guild_id } = body;
 
@@ -43,22 +27,32 @@ export class AppService {
       HOST_FRONTEND,
     } = process.env;
 
-    const { access_token, refresh_token } = await this.getToken(
-      new URLSearchParams({
-        client_id: DISCORD_CLIENT_ID,
-        client_secret: DISCORD_CLIENT_SECRET,
-        grant_type: 'authorization_code',
-        code,
-        redirect_uri: `${HOST_FRONTEND}/oauth/callback`,
-      }),
-    );
+    const { access_token, refresh_token } =
+      await wrappedFetch<ResponseBodyTokenExchange>(
+        `${DISCORD_API_ENDPOINT}/oauth2/token`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: new URLSearchParams({
+            client_id: DISCORD_CLIENT_ID,
+            client_secret: DISCORD_CLIENT_SECRET,
+            grant_type: 'authorization_code',
+            code,
+            redirect_uri: `${HOST_FRONTEND}/oauth/callback`,
+          }),
+        },
+      );
 
-    const meResponse = await wrappedFetch(`${DISCORD_API_ENDPOINT}/users/@me`, {
-      headers: {
-        Authorization: `Bearer ${access_token}`,
+    const me = await wrappedFetch<ResponseBodyUsersMe>(
+      `${DISCORD_API_ENDPOINT}/users/@me`,
+      {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+        },
       },
-    });
-    const me: ResponseBodyUsersMe = await meResponse.json();
+    );
 
     const existingUser = await prisma.helpdeskUsers.findFirst({
       where: {
@@ -91,7 +85,7 @@ export class AppService {
     const { t } = new DictService(me.locale);
 
     // TODO: コマンドIDなどをDBに保存する?
-    const commandResponse = await wrappedFetch(
+    const command = await wrappedFetch<ResponseBodyCommand>(
       `${DISCORD_API_ENDPOINT}/applications/${APPLICATION_ID}/guilds/${guild_id}/commands`,
       {
         method: 'POST',

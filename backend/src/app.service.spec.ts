@@ -18,9 +18,11 @@ describe('AppService', () => {
   });
 
   const mockGetToken = () => {
-    jest.spyOn(appService, 'getToken').mockResolvedValueOnce({
-      access_token: 'example_access_token',
-      refresh_token: 'example_refresh_token',
+    fetch.mockResolvedValueOnce({
+      ok: true,
+      json: () => {
+        return mockData.token;
+      },
     });
   };
   const mockGetMe = () => {
