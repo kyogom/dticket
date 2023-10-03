@@ -7,12 +7,22 @@ describe('AppService', () => {
   let appService: AppService;
 
   const mockData = {
-    channels: {},
-    guild: {
-      id: 'bcdc90ec-259e-4bf9-a89b-c1b56fb94c58',
-      name: 'hello',
-      icon: '26444d28-bb54-4887-ac3b-2cafcdfe74a9',
-      approximate_member_count: 10,
+    command: {
+      id: '1158560657030004736',
+      application_id: '1158543325788389406',
+      version: '1158560657030004737',
+      default_member_permissions: null,
+      type: 3,
+      name: 'Send this message via email',
+      name_localizations: {
+        ja: 'メールで返信',
+        'en-US': 'Send this message via email',
+        'en-GB': 'Send this message via email',
+      },
+      description: '',
+      description_localizations: null,
+      guild_id: '959619584644776028',
+      nsfw: false,
     },
     me: {
       avatar: 'avatar',
@@ -31,7 +41,6 @@ describe('AppService', () => {
     const app: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
-
     appService = app.get<AppService>(AppService);
   });
 
@@ -53,20 +62,11 @@ describe('AppService', () => {
     });
   };
 
-  const mockGetGuild = () => {
+  const mockPostCommand = () => {
     fetch.mockResolvedValueOnce({
       ok: true,
       json: () => {
-        return mockData.me;
-      },
-    });
-  };
-
-  const mockGetChannels = () => {
-    fetch.mockResolvedValueOnce({
-      ok: true,
-      json: () => {
-        return mockData.channels;
+        return mockData.command;
       },
     });
   };
@@ -76,8 +76,7 @@ describe('AppService', () => {
     it('should return ja createdUser', async () => {
       mockGetToken();
       mockGetMe();
-      mockGetGuild();
-      mockGetChannels();
+      mockPostCommand();
 
       return expect(
         await appService.createUser(mockData.createUserParam),
@@ -91,11 +90,10 @@ describe('AppService', () => {
 
   describe('createUser', () => {
     // FIXME: prismaもモックする
-    it('should return ja createdUser', async () => {
+    it('should return en createdUser', async () => {
       mockGetToken();
       mockGetMe();
-      mockGetGuild();
-      mockGetChannels();
+      mockPostCommand();
       mockData.me.locale = 'en';
 
       return expect(

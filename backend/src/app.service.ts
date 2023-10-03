@@ -15,13 +15,13 @@ import {
   InteractionType,
   verifyKey,
 } from 'discord-interactions';
-import { PrismaService } from './prisma.service';
 import { randomUUID } from 'crypto';
 import DictService from './dict.service';
+import prisma from '../prisma/client';
 
 @Injectable()
 export class AppService {
-  constructor(private prisma: PrismaService) {}
+  constructor() {}
 
   getHello(): string {
     return 'Hello World!';
@@ -119,13 +119,13 @@ export class AppService {
     }
     const me: ResponseBodyUsersMe = await meResponse.json();
 
-    const existingUser = await this.prisma.helpdeskUsers.findUnique({
+    const existingUser = await prisma.helpdeskUsers.findFirst({
       where: {
         discordId: me.id,
       },
     });
     if (existingUser === null) {
-      await this.prisma.helpdeskUsers.create({
+      await prisma.helpdeskUsers.create({
         data: {
           accessToken: access_token,
           discordId: me.id,
