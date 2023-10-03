@@ -95,11 +95,11 @@ export class AppService {
         },
         body: JSON.stringify({
           type: 3,
-          name: 'Send this message via email',
+          name: 'Reply email',
           name_localizations: {
             ja: 'メールで返信',
-            'en-US': 'Send this message via email',
-            'en-GB': 'Send this message via email',
+            'en-US': 'Reply email',
+            'en-GB': 'Reply email',
           },
         }),
       },
