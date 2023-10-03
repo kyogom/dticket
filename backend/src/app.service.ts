@@ -10,6 +10,14 @@ import DictService from './dict.service';
 import prisma from '../prisma/client';
 import wrappedFetch from './fetchClient';
 
+const {
+  APPLICATION_ID,
+  BOT_TOKEN,
+  DISCORD_CLIENT_ID,
+  DISCORD_CLIENT_SECRET,
+  HOST_FRONTEND,
+} = process.env;
+
 @Injectable()
 export class AppService {
   async createUser(body: { code: string; guild_id: string }) {
@@ -18,14 +26,6 @@ export class AppService {
     if (typeof code !== 'string' || typeof guild_id !== 'string') {
       throw new HttpException('Bad Request', HttpStatus.BAD_REQUEST);
     }
-
-    const {
-      APPLICATION_ID,
-      BOT_TOKEN,
-      DISCORD_CLIENT_ID,
-      DISCORD_CLIENT_SECRET,
-      HOST_FRONTEND,
-    } = process.env;
 
     const { access_token, refresh_token } =
       await wrappedFetch<ResponseBodyTokenExchange>(
