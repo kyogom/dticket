@@ -1,6 +1,8 @@
 # dticket
 
-個人開発サービス DiscordTicket のコード
+個人開発サービス DiscordTicket の作りかけ
+メールはメールクライアントでメッセージを送るほうが便利なことに気づいて断念。
+Oauth 周りとテスト周りは割としっかり実装してある
 
 ## Backend
 
