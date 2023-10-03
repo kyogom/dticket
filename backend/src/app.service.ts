@@ -24,12 +24,12 @@ export class AppService {
   constructor(private prisma: PrismaService) {}
 
   getHello(): string {
-    return 'Hello World!2';
+    return 'Hello World!';
   }
 
   async handleInteractInit(
     req: RawBodyRequest<Request>,
-    body: RequestBodyInteraction & { webhookTest: boolean },
+    body: RequestBodyInteraction,
   ) {
     const signature = req.headers['x-signature-ed25519'] ?? '';
     const timestamp = req.headers['x-signature-timestamp'] ?? '';
